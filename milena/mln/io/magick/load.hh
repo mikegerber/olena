@@ -153,7 +153,24 @@ namespace mln
 	// FIXME: Handle Magick++'s exceptions (see either
 	// ImageMagick++'s or GraphicsMagick++'s documentation).
 	Magick::Image magick_ima(filename);
-	magick_ima.read(filename);
+ 	try {
+		magick_ima.read(filename);
+	}
+	catch( Magick::WarningCoder &warning ) {
+		// Process coder warning while loading file (e.g. TIFF warning)
+		// Maybe the user will be interested in these warnings (or not).
+		// If a warning is produced while loading an image, the image
+		// can normally still be used (but not if the warning was about
+		// something important!)
+		std::cerr << "warning: magick read: " << warning.what() << std::endl;
+	} catch( Magick::Warning &warning ) {
+		// Handle any other Magick++ warning.
+		std::cerr << "warning: magick read: " << warning.what() << std::endl;
+	} catch( Magick::ErrorFileOpen &error ) {
+		// Process Magick++ file open error
+		std::cerr << "error: magick read: " << error.what() << std::endl;
+		abort();
+	}
 	magick_ima.type(Magick::TrueColorType);
 	int nrows = magick_ima.rows();
 	int ncols = magick_ima.columns();
