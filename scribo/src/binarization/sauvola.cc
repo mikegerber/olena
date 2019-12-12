@@ -29,6 +29,8 @@
 #include <mln/io/magick/all.hh>
 #include <mln/data/transform.hh>
 #include <mln/fun/v2v/rgb_to_luma.hh>
+#include <mln/arith/revert.hh>
+#include <mln/logical/not.hh>
 
 #include <scribo/binarization/sauvola.hh>
 #include <scribo/debug/option_parser.hh>
@@ -46,6 +48,8 @@ static const scribo::debug::arg_data arg_desc[] =
 static const scribo::debug::toggle_data toggle_desc[] =
 {
   // name, description, default value
+  { "negate-input", "Negate input image before binarizing.", false },
+  { "negate-output", "Negate output image after binarizing.", false },
   {0, 0, false}
 };
 
@@ -95,12 +99,18 @@ int main(int argc, char *argv[])
   image2d<value::int_u8>
     input_1_gl = data::transform(input, mln::fun::v2v::rgb_to_luma<value::int_u8>());
 
+  if (options.is_enabled("negate-input"))
+    arith::revert_inplace(input_1_gl);
+
   scribo::debug::logger().start_time_logging();
 
   // Binarize
   image2d<bool> out = scribo::binarization::sauvola(input_1_gl, w, k);
 
   scribo::debug::logger().stop_time_logging("Binarized in");
+
+  if (options.is_enabled("negate-output"))
+    logical::not_inplace(out);
 
   io::magick::save(out, options.arg("output.*"));
 
