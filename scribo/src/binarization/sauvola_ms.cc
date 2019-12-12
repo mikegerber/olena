@@ -30,6 +30,7 @@
 #include <mln/value/int_u8.hh>
 #include <mln/io/magick/all.hh>
 #include <mln/data/transform.hh>
+#include <mln/arith/revert.hh>
 #include <mln/fun/v2v/rgb_to_luma.hh>
 #include <mln/util/timer.hh>
 #include <mln/logical/not.hh>
@@ -50,6 +51,8 @@ static const scribo::debug::arg_data arg_desc[] =
 static const scribo::debug::toggle_data toggle_desc[] =
 {
   // name, description, default value
+  { "negate-input", "Negate input image before binarizing.", false },
+  { "negate-output", "Negate output image after binarizing.", false },
   { "negate", "Negate output image.", false},
   {0, 0, false}
 };
@@ -137,6 +140,8 @@ int main(int argc, char *argv[])
     input_1_gl = data::transform(input_1,
 				 mln::fun::v2v::rgb_to_luma<value::int_u8>());
 
+  if (options.is_enabled("negate-input"))
+    arith::revert_inplace(input_1_gl);
 
   scribo::debug::logger().start_time_logging();
 
@@ -146,8 +151,8 @@ int main(int argc, char *argv[])
 
   scribo::debug::logger().stop_time_logging("Binarized in");
 
-  if (options.is_enabled("negate"))
-    io::magick::save(logical::not_(output), options.arg("output.*"));
-  else
-    io::magick::save(output, options.arg("output.*"));
+  if (options.is_enabled("negate") || options.is_enabled("negate-output"))
+    logical::not_inplace(output);
+  
+  io::magick::save(output, options.arg("output.*"));
 }

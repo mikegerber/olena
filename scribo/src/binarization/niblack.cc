@@ -39,7 +39,7 @@
 static const scribo::debug::arg_data arg_desc[] =
 {
   { "input.*", "An image." },
-  { "output.pbm", "A binary image." },
+  { "output.*", "A binary image." },
   {0, 0}
 };
 
@@ -48,6 +48,8 @@ static const scribo::debug::arg_data arg_desc[] =
 static const scribo::debug::toggle_data toggle_desc[] =
 {
   // name, description, default value
+  { "negate-input", "Negate input image before binarizing.", true },
+  { "negate-output", "Negate output image after binarizing.", true },
   {0, 0, false}
 };
 
@@ -97,9 +99,11 @@ int main(int argc, char *argv[])
   image2d<value::int_u8>
     input_1_gl = data::transform(input, mln::fun::v2v::rgb_to_luma<value::int_u8>());
 
-  arith::revert_inplace(input_1_gl);
+  if (options.is_enabled("negate-input"))
+    arith::revert_inplace(input_1_gl);
   image2d<bool> out = scribo::binarization::niblack(input_1_gl, w, k);
-  logical::not_inplace(out);
-  io::magick::save(out, options.arg("output.pbm"));
+  if (options.is_enabled("negate-output"))
+    logical::not_inplace(out);
+  io::magick::save(out, options.arg("output.*"));
 
 }

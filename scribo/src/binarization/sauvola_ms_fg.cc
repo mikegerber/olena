@@ -28,10 +28,11 @@
 
 #include <mln/core/image/image2d.hh>
 #include <mln/value/rgb8.hh>
-#include <mln/io/magick/load.hh>
-#include <mln/io/pbm/save.hh>
+#include <mln/io/magick/all.hh>
 #include <mln/data/transform.hh>
 #include <mln/fun/v2v/rgb_to_luma.hh>
+#include <mln/arith/revert.hh>
+#include <mln/logical/not.hh>
 
 #include <scribo/binarization/sauvola_ms.hh>
 #include <scribo/preprocessing/split_bg_fg.hh>
@@ -41,7 +42,7 @@
 static const scribo::debug::arg_data arg_desc[] =
 {
   { "input.*", "An image." },
-  { "output.pbm", "A binary image." },
+  { "output.*", "A binary image." },
   {0, 0}
 };
 
@@ -50,6 +51,8 @@ static const scribo::debug::arg_data arg_desc[] =
 static const scribo::debug::toggle_data toggle_desc[] =
 {
   // name, description, default value
+  // { "negate-input", "Negate input image before binarizing.", false },
+  { "negate-output", "Negate output image after binarizing.", false },
   {0, 0, false}
 };
 
@@ -130,6 +133,11 @@ int main(int argc, char *argv[])
   image2d<value::rgb8> input_1;
   io::magick::load(input_1, options.arg("input.*"));
 
+  /*
+  if (options.is_enabled("negate-input"))
+    arith::revert_inplace(input_1);
+  */
+  
   // Split foreground/background
   image2d<value::rgb8>
     fg = scribo::preprocessing::split_bg_fg(input_1, lambda, 32).first();
@@ -142,7 +150,10 @@ int main(int argc, char *argv[])
   image2d<bool>
     output = scribo::binarization::sauvola_ms(fg_gl, w_1, s);
 
-  io::pbm::save(output, options.arg("output.pbm"));
+  if (options.is_enabled("negate-output"))
+    logical::not_inplace(output);
+  
+  io::magick::save(output, options.arg("output.*"));
 }
 
 
