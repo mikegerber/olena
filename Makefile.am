@@ -30,7 +30,6 @@ endif ENABLE_SCRIBO
 # We rely on Automake to ensure that the documentions are generated in
 # the right order.  Here, we make sure that the general documentation
 # will be generated after Milena's and Scribo's documentation.
-SUBDIRS += doc
 
 # Target shortcuts delegating the actual action to milena/Makefile.
 LOCAL_RECURSIVE_TARGETS = tests

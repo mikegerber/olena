@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Olena.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = . doc mesh tests
+SUBDIRS = . mesh tests
 
 if ENABLE_APPS
   SUBDIRS += apps
@@ -35,7 +35,7 @@ tests:
 
 # Regen files recursively.
 include $(top_srcdir)/build-aux/regen-recursive.mk
-REGEN_SUBDIRS += doc tests
+REGEN_SUBDIRS += tests
 
 # Force the regeneration of `headers.mk'.
 #
