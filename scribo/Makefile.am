@@ -15,7 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Olena.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = demo tests src
+SUBDIRS = demo $(DOCDIR) tests src
+
+if ENABLE_DOC
+  SUBDIRS += doc
+endif ENABLE_DOC
+
 
 .PHONY: bin
 bin:

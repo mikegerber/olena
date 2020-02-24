@@ -170,7 +170,14 @@ fi
 ## Documentation.  ##
 ## --------------- ##
 
+# Switch to enable doc
+AC_ARG_ENABLE([doc],
+              [AS_HELP_STRING([--enable-doc],
+                              [build documentation])])
+AM_CONDITIONAL([ENABLE_DOC], [test "x$enable_doc" = xyes])
+
 # Tools used to build the documentation.
+
 
 # rst2html can have many names, especially in the MacPorts, where
 # py-docutils binaries include their version numbers in their names.
@@ -215,6 +222,7 @@ AC_ARG_ENABLE([all],
      enable_scribo=yes
      enable_apps=yes
      enable_tools=yes
+     enable_doc=yes
    fi])
 
 
@@ -733,6 +741,7 @@ Swilena                 --enable-swilena        $enable_swilena
 -------------------------------------------------------------------------------
 Apps                    --enable-apps           $enable_apps
 Tools                   --enable-tools          $enable_tools
+Doc                     --enable-doc            $enable_doc
 -------------------------------------------------------------------------------
 
 
