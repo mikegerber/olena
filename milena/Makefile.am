@@ -105,9 +105,7 @@ edit = sed -e 's,@PACKAGE_BUGREPORT[@],$(PACKAGE_BUGREPORT),g'	\
 EXTRA_DIST = mln/version.hh.in
 $(srcdir)/mln/version.hh: mln/version.hh.in $(top_srcdir)/configure.ac Makefile.am
 	rm -f $@ $@.tmp
-	srcdir=''; \
-	  test -f ./$@.in || srcdir=$(srcdir)/; \
-	  $(edit) $${srcdir}$@.in >$@.tmp
+	$(edit) $@.in >$@.tmp
 	chmod a-w $@.tmp
 	mv $@.tmp $@
 
