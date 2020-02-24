@@ -170,13 +170,8 @@ namespace scribo
 				const Image<I>& ima, const char *name);
 
 	template <unsigned n, typename I>
-	void
-	log_image_dispatch(const value::label<n>&,
-			   const Image<I>& ima, const char *name);
-
-	template <typename I>
-	void log_image_dispatch(const mln_value(I)&,
-				const Image<I>& ima, const char *name);
+	void log_image_dispatch(const value::label<n>&,
+                                const Image<I>& ima, const char *name);
 
 	template <typename I>
 	void log_image_dispatch(const value::rgb8&,
