@@ -60,7 +60,7 @@ static const scribo::debug::opt_data opt_desc[] =
   // name, description, arguments, check args function, number of args, default arg
   { "debug-prefix", "Enable debug image outputs. Prefix image name with that "
     "given prefix.", "<prefix>", 0, 1, 0 },
-  { "all-k", "Sauvola's formulae parameter", "<value>", 0, 1, "0.34" },
+  { "all-k", "Sauvola's formulae parameter", "<value>", 0, 1, 0 },
 
   { "k2", "Sauvola's formulae parameter", "<value>", 0, 1, "0.20" },
   { "k3", "Sauvola's formulae parameter", "<value>", 0, 1, "0.30" },
@@ -106,19 +106,19 @@ int main(int argc, char *argv[])
   // First subsampling scale.
   unsigned s = atoi(options.opt_value("s").c_str());
 
-  // Setting k parameter.
-  double k = atof(options.opt_value("all-k").c_str());
-  binarization::internal::k2 = k;
-  binarization::internal::k3 = k;
-  binarization::internal::k4 = k;
+  // Setting k parameter for specific scales.
+  binarization::internal::k2 = atof(options.opt_value("k2").c_str());
+  binarization::internal::k3 = atof(options.opt_value("k3").c_str());
+  binarization::internal::k4 = atof(options.opt_value("k4").c_str());
 
-  // Override k parameter for specific scales.
-  if (options.is_set("k2"))
-    binarization::internal::k2 = atof(options.opt_value("k2").c_str());
-  if (options.is_set("k3"))
-    binarization::internal::k3 = atof(options.opt_value("k3").c_str());
-  if (options.is_set("k4"))
-    binarization::internal::k4 = atof(options.opt_value("k4").c_str());
+  // Override k parameter for all scales.
+  if (options.is_set("all-k"))
+  {
+    double k = atof(options.opt_value("all-k").c_str());
+    binarization::internal::k2 = k;
+    binarization::internal::k3 = k;
+    binarization::internal::k4 = k;
+  }
 
   scribo::debug::logger() << "Using w_1=" << w_1 << " - s=" << s
 			  << " - k2=" << binarization::internal::k2

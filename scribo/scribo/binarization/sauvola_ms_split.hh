@@ -105,8 +105,7 @@ namespace scribo
     template <typename I>
     mln_ch_value(I, bool)
     sauvola_ms_split(const Image<I>& input_1_, unsigned w_1,
-		     unsigned s, unsigned min_ntrue, double k2,
-		     double k3, double k4)
+		     unsigned s, unsigned min_ntrue)
     {
       mln_trace("scribo::binarization::sauvola_ms_split");
 
@@ -118,10 +117,6 @@ namespace scribo
       typedef mln_ch_value(I,bool) bin_t;
 
       mln_ch_value(I, value::int_u8) r_i, g_i, b_i;
-
-      binarization::internal::k2 = k2;
-      binarization::internal::k3 = k3;
-      binarization::internal::k4 = k4;
 
       // Split the rgb8 image into 3 intensity images.
       mln::data::split(input_1, r_i, g_i, b_i);
@@ -173,18 +168,25 @@ namespace scribo
     sauvola_ms_split(const Image<I>& input_1, unsigned w_1,
 		     unsigned s, unsigned min_ntrue, double K)
     {
-      return sauvola_ms_split(input_1, w_1, s, min_ntrue,
-			      K, K, K);
+      binarization::internal::k2 = K;
+      binarization::internal::k3 = K;
+      binarization::internal::k4 = K;
+      
+      return sauvola_ms_split(input_1, w_1, s, min_ntrue);
     }
 
 
     template <typename I>
     mln_ch_value(I, bool)
     sauvola_ms_split(const Image<I>& input_1, unsigned w_1,
-		     unsigned s, unsigned min_ntrue)
+		     unsigned s, unsigned min_ntrue,
+                     double k2, double k3, double k4)
     {
-      return sauvola_ms_split(input_1, w_1, s, min_ntrue,
-			      SCRIBO_DEFAULT_SAUVOLA_K);
+      binarization::internal::k2 = k2;
+      binarization::internal::k3 = k3;
+      binarization::internal::k4 = k4;
+
+      return sauvola_ms_split(input_1, w_1, s, min_ntrue);
     }
 
 # endif // ! MLN_INCLUDE_ONLY
