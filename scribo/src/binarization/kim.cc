@@ -32,6 +32,8 @@
 #include <mln/io/magick/all.hh>
 #include <mln/data/transform.hh>
 #include <mln/fun/v2v/rgb_to_luma.hh>
+#include <mln/arith/revert.hh>
+#include <mln/logical/not.hh>
 #include <scribo/binarization/kim.hh>
 #include <scribo/debug/option_parser.hh>
 #include <scribo/debug/logger.hh>
@@ -49,6 +51,8 @@ static const scribo::debug::arg_data arg_desc[] =
 static const scribo::debug::toggle_data toggle_desc[] =
 {
   // name, description, default value
+  { "negate-input", "Negate input image before binarizing.", false },
+  { "negate-output", "Negate output image after binarizing.", false },
   {0, 0, false}
 };
 
@@ -106,8 +110,14 @@ int main(int argc, char *argv[])
     input_1_gl = data::transform(input_1,
 				 mln::fun::v2v::rgb_to_luma<value::int_u8>());
 
+  if (options.is_enabled("negate-input"))
+    arith::revert_inplace(input_1_gl);
+
   image2d<bool>
     output = scribo::binarization::kim(input_1_gl, w_1, k);
+
+  if (options.is_enabled("negate-output"))
+    logical::not_inplace(output);
 
   io::magick::save(output, options.arg("output.*"));
 }
