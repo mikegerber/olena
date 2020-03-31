@@ -28,6 +28,18 @@
 #ifndef SCRIBO_BINARIZATION_SAUVOLA_MS_HH
 # define SCRIBO_BINARIZATION_SAUVOLA_MS_HH
 
+// Setup default Sauvola's formula parameters values at different scales.
+//
+// Values are set according to the following reference:
+// Lazzara, G. and Géraud, T.: Efficient multiscale Sauvola’s binarization.
+// IJDAR 2013, DOI 10.1007/s10032-013-0209-0
+//
+// "According to our experiment using k2 = 0.2, k3 = 0.3 and k4 = 0.5
+//  gives good results."
+# define SCRIBO_DEFAULT_SAUVOLA_MS_K2 0.2
+# define SCRIBO_DEFAULT_SAUVOLA_MS_K3 0.3
+# define SCRIBO_DEFAULT_SAUVOLA_MS_K4 0.5
+
 /// \file
 ///
 /// \brief Binarize an image using a multi-scale implementation of
@@ -97,12 +109,14 @@ namespace scribo
       \param[in] w_1 The window size used to compute stats.
       \param[in] s The scale factor used for the first subscaling
       (usually 2 or 3 is enough).
+      \param[in] k2 Sauvola's K parameter for the lowest scale.
+      \param[in] k3 Sauvola's K parameter for the medium scales.
+      \param[in] k4 Sauvola's K parameter for the highest scale.
       \param[out] integral_sum_sum_2 Integral image of sum and squared
                                      sum.
 
-      Sauvola's formula parameter K is set to 0.34.  \p w_1 and \p
-      lambda_min_1 are expressed according to the image at scale 0,
-      i.e. the original size.
+      \p w_1 and \p lambda_min_1 are expressed according to the image
+      at scale 0, i.e. the original size.
 
       \return A Boolean image.
 
@@ -127,12 +141,13 @@ namespace scribo
     template <typename I>
     mln_ch_value(I,bool)
     sauvola_ms(const Image<I>& input_1, unsigned w_1,
-	       unsigned s,
+	       unsigned s, double k2, double k3, double k4,
 	       image2d<mln::util::couple<double,double> >& integral_sum_sum_2);
 
     /// \overload
     /// The integral image is not returned.
-    /// K is set to 0.34.
+    /// Sauvola's K is set to the default on each scale, i.e.
+    /// 0.2 (lowest) / 0.3 (medium) / 0.5 (highest).
     ///
     /// \ingroup grpalgobinsauvola
     //
@@ -142,7 +157,8 @@ namespace scribo
 
     /// \overload
     /// The integral image is not returned.
-    /// K is set to 0.34.
+    /// Sauvola's K parameter is set to the default on each scale,
+    /// i.e. 0.2 (lowest) / 0.3 (medium) / 0.5 (highest).
     /// s is set to 3.
     ///
     /// \ingroup grpalgobinsauvola
@@ -152,15 +168,16 @@ namespace scribo
     sauvola_ms(const Image<I>& input_1, unsigned w_1);
 
     /// \overload
-    /// Allow to specify a different k parameter for each scale.
+    /// Sauvola's K parameter is set to the default on each scale,
+    /// i.e. 0.2 (lowest) / 0.3 (medium) / 0.5 (highest).
     //
     template <typename I>
     mln_ch_value(I,bool)
-    sauvola_ms(const Image<I>& input_1, unsigned w_1, unsigned s,
-	       double k2, double k3, double k4);
+    sauvola_ms(const Image<I>& input_1, unsigned w_1, unsigned s);
 
     /// \overload
-    /// Allow to specify the same k parameter for all scales.
+    /// Allow to specify the same value for Sauvola's K parameter
+    /// on all scales.
     //
     template <typename I>
     mln_ch_value(I,bool)
@@ -193,7 +210,7 @@ namespace scribo
       image2d<int_u8>
       compute_t_n_and_e_2(const image2d<int_u8>& sub, image2d<int_u8>& e_2,
 			  unsigned lambda_min, unsigned lambda_max,
-			  unsigned s,
+			  unsigned s, double k,
 			  unsigned q, unsigned i, unsigned w,
 			  const image2d<mln::util::couple<double,double> >& integral_sum_sum_2)
       {
@@ -210,7 +227,7 @@ namespace scribo
 
 	// 1st pass
 	scribo::binarization::internal::sauvola_ms_functor< image2d<int_u8> >
-	  f(sub, SCRIBO_DEFAULT_SAUVOLA_R, e_2, i, q);
+	  f(sub, k, SCRIBO_DEFAULT_SAUVOLA_R, e_2, i, q);
 	scribo::canvas::integral_browsing(integral_sum_sum_2,
 					  ratio,
 					  w_local_w, w_local_h,
@@ -820,7 +837,7 @@ namespace scribo
 	template <typename I>
 	mln_ch_value(I,bool)
 	sauvola_ms(const Image<I>& input_1_, unsigned w_1,
-		   unsigned s,
+		   unsigned s, double k2, double k3, double k4,
 		   image2d<mln::util::couple<double,double> >& integral_sum_sum_2)
 	{
 	  mln_trace("scribo::binarization::sauvola_ms");
@@ -935,7 +952,7 @@ namespace scribo
 	    t_ima[i] = internal::compute_t_n_and_e_2(sub_ima[i], e_2,
 						     (max_s2 * q_2) / (q_2) * min_coef,
 						     mln_max(unsigned),
-						     s,
+						     s, k4,
 						     q, i, w_work,
 						     integral_sum_sum_2);
 	  }
@@ -947,7 +964,7 @@ namespace scribo
 	      t_ima[i] = internal::compute_t_n_and_e_2(sub_ima[i], e_2,
 						       max_s2 / (q_2) * min_coef,
 						       max_s2 * q_2,
-						       s,
+						       s, k3,
 						       q, i, w_work,
 						       integral_sum_sum_2);
 	    }
@@ -959,7 +976,8 @@ namespace scribo
             // FIXME: was '0'. '2' is to avoid too much noise with k=0.2.
 						     2,
 						     max_s2,
-						     s, 1, 2, w_work,
+						     s, k2,
+                                                     1, 2, w_work,
 						     integral_sum_sum_2);
 	  }
 
@@ -1031,6 +1049,7 @@ namespace scribo
     template <typename I>
     mln_ch_value(I,bool)
     sauvola_ms(const Image<I>& input_1_, unsigned w_1, unsigned s,
+               double k2, double k3, double k4,
 	       image2d<mln::util::couple<double,double> >& integral_sum_sum_2)
     {
       mln_trace("scribo::binarization::sauvola_ms");
@@ -1044,6 +1063,7 @@ namespace scribo
 
       mln_ch_value(I,bool)
 	output = impl::generic::sauvola_ms(exact(input_1_), w_1, s,
+                                           k2, k3, k4,
 					   integral_sum_sum_2);
 
       return output;
@@ -1051,7 +1071,8 @@ namespace scribo
 
     template <typename I>
     mln_ch_value(I,bool)
-    sauvola_ms(const Image<I>& input_1_, unsigned w_1, unsigned s)
+    sauvola_ms(const Image<I>& input_1_, unsigned w_1, unsigned s,
+               double k2, double k3, double k4)
     {
       mln_trace("scribo::binarization::sauvola_ms");
 
@@ -1066,7 +1087,7 @@ namespace scribo
       integral_t integral_sum_sum_2;
 
       mln_ch_value(I,bool)
-	output = sauvola_ms(input_1_, w_1, s, integral_sum_sum_2);
+	output = sauvola_ms(input_1_, w_1, s, k2, k3, k4, integral_sum_sum_2);
 
       return output;
     }
@@ -1076,20 +1097,21 @@ namespace scribo
     mln_ch_value(I,bool)
     sauvola_ms(const Image<I>& input_1, unsigned w_1)
     {
-      return sauvola_ms(input_1, w_1, 3);
+      return sauvola_ms(input_1, w_1, 3,
+                        SCRIBO_DEFAULT_SAUVOLA_MS_K2,
+                        SCRIBO_DEFAULT_SAUVOLA_MS_K3,
+                        SCRIBO_DEFAULT_SAUVOLA_MS_K4);
     }
 
 
     template <typename I>
     mln_ch_value(I,bool)
-    sauvola_ms(const Image<I>& input_1, unsigned w_1, unsigned s,
-	       double k2, double k3, double k4)
+    sauvola_ms(const Image<I>& input_1, unsigned w_1, unsigned s)
     {
-      binarization::internal::k2 = k2;
-      binarization::internal::k3 = k3;
-      binarization::internal::k4 = k4;
-
-      return sauvola_ms(input_1, w_1, s);
+      return sauvola_ms(input_1, w_1, s,
+                        SCRIBO_DEFAULT_SAUVOLA_MS_K2,
+                        SCRIBO_DEFAULT_SAUVOLA_MS_K3,
+                        SCRIBO_DEFAULT_SAUVOLA_MS_K4);
     }
 
 
@@ -1098,11 +1120,7 @@ namespace scribo
     sauvola_ms(const Image<I>& input_1, unsigned w_1, unsigned s,
 	       double all_k)
     {
-      binarization::internal::k2 = all_k;
-      binarization::internal::k3 = all_k;
-      binarization::internal::k4 = all_k;
-
-      return sauvola_ms(input_1, w_1, s);
+      return sauvola_ms(input_1, w_1, s, all_k, all_k, all_k);
     }
 
 
