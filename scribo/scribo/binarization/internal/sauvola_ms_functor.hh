@@ -54,11 +54,6 @@ namespace scribo
     namespace internal
     {
 
-      extern double k2;
-      extern double k3;
-      extern double k4;
-
-
       using namespace mln;
 
 
@@ -91,7 +86,7 @@ namespace scribo
 
 	sauvola_formula formula_;
 
-	sauvola_ms_functor(const I& input, double R,
+	sauvola_ms_functor(const I& input, double K, double R,
 			   const image2d<value::int_u8>&e_2,
 			   unsigned i, unsigned q);
 
@@ -106,15 +101,6 @@ namespace scribo
 # ifndef MLN_INCLUDE_ONLY
 
 
-#  ifndef MLN_WO_GLOBAL_VARS
-
-      double k2 = SCRIBO_DEFAULT_SAUVOLA_K;
-      double k3 = SCRIBO_DEFAULT_SAUVOLA_K;
-      double k4 = SCRIBO_DEFAULT_SAUVOLA_K;
-
-#  endif // ! MLN_WO_GLOBAL_VARS
-
-
       inline
       unsigned my_find_root(image2d<unsigned>& parent, unsigned x)
       {
@@ -127,6 +113,7 @@ namespace scribo
 
       template <typename I>
       sauvola_ms_functor<I>::sauvola_ms_functor(const I& input,
+                                                double K,
 						double R,
 						const image2d<value::int_u8>&e_2,
 						unsigned i, unsigned q)
@@ -135,6 +122,7 @@ namespace scribo
 	  i(i),
 	  q(q),
 	  pxl(input),
+          K_(K),
 	  R_(R),
 	  i_(i)
       {
@@ -166,12 +154,6 @@ namespace scribo
 	dp = negative_offsets_wrt(input, c8());
 	n_nbhs = dp.nelements();
 
-	if (i == 2)
-	  K_ = binarization::internal::k2;
-	else if (i == 3)
-	  K_ = binarization::internal::k3;
-	else
-	  K_ = binarization::internal::k4;
       }
 
 

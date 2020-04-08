@@ -40,7 +40,7 @@ tests:
 
 # Regen files recursively.
 include $(top_srcdir)/build-aux/regen-recursive.mk
-REGEN_SUBDIRS += tests
+REGEN_SUBDIRS += doc tests
 
 # Force the regeneration of `headers.mk'.
 #

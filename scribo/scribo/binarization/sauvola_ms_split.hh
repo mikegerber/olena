@@ -59,9 +59,9 @@ namespace scribo
       \param[in] min_ntrue A site is set to 'True' in the output if it
                            is set to 'True' at least \p min_ntrue
                            components. Possible values: 1, 2, 3.
-      \param[in] k2 Sauvola's formula parameter.
-      \param[in] k3 Sauvola's formula parameter.
-      \param[in] k4 Sauvola's formula parameter.
+      \param[in] k2 Sauvola's K parameter for the lowest scale.
+      \param[in] k3 Sauvola's K parameter for the medium scales.
+      \param[in] k4 Sauvola's K parameter for the highest scale.
 
       \p w_1 is expressed according to the image at scale 0, i.e. the
       original size.
@@ -77,7 +77,8 @@ namespace scribo
 		     double k3, double k4);
 
     /*! \overload
-      k2, k3 and k4 are set to \p K.
+      Allow to specify the same value for Sauvola's \p K parameter
+      on all scales.
 
       \ingroup grpalgobinsauvola
     */
@@ -88,7 +89,8 @@ namespace scribo
 
 
     /*! \overload
-      k2, k3 and k4 are set to 0.34.
+      Sauvola's K parameter is set to the default on each scale,
+      i.e. 0.2 (lowest) / 0.3 (medium) / 0.5 (highest).
 
       \ingroup grpalgobinsauvola
     */
@@ -105,7 +107,8 @@ namespace scribo
     template <typename I>
     mln_ch_value(I, bool)
     sauvola_ms_split(const Image<I>& input_1_, unsigned w_1,
-		     unsigned s, unsigned min_ntrue)
+		     unsigned s, unsigned min_ntrue,
+                     double k2, double k3, double k4)
     {
       mln_trace("scribo::binarization::sauvola_ms_split");
 
@@ -123,9 +126,9 @@ namespace scribo
 
       bin_t r_b, g_b, b_b;
 
-      r_b = sauvola_ms(r_i, w_1, s);
-      g_b = sauvola_ms(g_i, w_1, s);
-      b_b = sauvola_ms(b_i, w_1, s);
+      r_b = sauvola_ms(r_i, w_1, s, k2, k3, k4);
+      g_b = sauvola_ms(g_i, w_1, s, k2, k3, k4);
+      b_b = sauvola_ms(b_i, w_1, s, k2, k3, k4);
 
       border::resize(r_b, input_1.border());
       border::resize(g_b, input_1.border());
@@ -168,25 +171,19 @@ namespace scribo
     sauvola_ms_split(const Image<I>& input_1, unsigned w_1,
 		     unsigned s, unsigned min_ntrue, double K)
     {
-      binarization::internal::k2 = K;
-      binarization::internal::k3 = K;
-      binarization::internal::k4 = K;
-      
-      return sauvola_ms_split(input_1, w_1, s, min_ntrue);
+      return sauvola_ms_split(input_1, w_1, s, min_ntrue, K, K, K);
     }
 
 
     template <typename I>
     mln_ch_value(I, bool)
     sauvola_ms_split(const Image<I>& input_1, unsigned w_1,
-		     unsigned s, unsigned min_ntrue,
-                     double k2, double k3, double k4)
+		     unsigned s, unsigned min_ntrue)
     {
-      binarization::internal::k2 = k2;
-      binarization::internal::k3 = k3;
-      binarization::internal::k4 = k4;
-
-      return sauvola_ms_split(input_1, w_1, s, min_ntrue);
+      return sauvola_ms_split(input_1, w_1, s, min_ntrue,
+                              SCRIBO_DEFAULT_SAUVOLA_MS_K2,
+                              SCRIBO_DEFAULT_SAUVOLA_MS_K3,
+                              SCRIBO_DEFAULT_SAUVOLA_MS_K4);
     }
 
 # endif // ! MLN_INCLUDE_ONLY

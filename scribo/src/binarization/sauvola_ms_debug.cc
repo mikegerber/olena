@@ -64,11 +64,10 @@ static const scribo::debug::opt_data opt_desc[] =
   // name, description, arguments, check args function, number of args, default arg
   { "debug-prefix", "Enable debug image outputs. Prefix image name with that "
     "given prefix.", "<prefix>", 0, 1, 0 },
-  { "all-k", "Sauvola's formulae parameter", "<value>", 0, 1, "0.34" },
-
-  { "k2", "Sauvola's formulae parameter", "<value>", 0, 1, 0 },
-  { "k3", "Sauvola's formulae parameter", "<value>", 0, 1, 0 },
-  { "k4", "Sauvola's formulae parameter", "<value>", 0, 1, 0 },
+  { "all-k", "Sauvola's formula parameter k on all scales (no default)", "<value>", 0, 1, NULL },
+  { "k2", "Sauvola's formula parameter k for lowest scale (default 0.2)", "<value>", 0, 1, NULL },
+  { "k3", "Sauvola's formula parameter k for medium scales (default 0.3)", "<value>", 0, 1, NULL },
+  { "k4", "Sauvola's formula parameter k for highest scale (default 0.5)", "<value>", 0, 1, NULL },
 
   { "s", "First subsampling ratio. Possible values: 2 or 3.", "ratio",
     scribo::debug::check_sauvola_first_subsampling, 1, "3" },
@@ -135,25 +134,32 @@ int main(int argc, char *argv[])
   // First subsampling scale.
   unsigned s = atoi(options.opt_value("s").c_str());
 
+  // Set default k parameter.
+  double k2 = SCRIBO_DEFAULT_SAUVOLA_MS_K2;
+  double k3 = SCRIBO_DEFAULT_SAUVOLA_MS_K3;
+  double k4 = SCRIBO_DEFAULT_SAUVOLA_MS_K4;
 
-  // Setting k parameter.
-  double k = atof(options.opt_value("all-k").c_str());
-  binarization::internal::k2 = k;
-  binarization::internal::k3 = k;
-  binarization::internal::k4 = k;
+  // Override k parameter for all scales.
+  if (options.is_set("all-k"))
+  {
+    double k = atof(options.opt_value("all-k").c_str());
+    k2 = k;
+    k3 = k;
+    k4 = k;
+  }
 
   // Override k parameter for specific scales.
   if (options.is_set("k2"))
-    binarization::internal::k2 = atof(options.opt_value("k2").c_str());
+    k2 = atof(options.opt_value("k2").c_str());
   if (options.is_set("k3"))
-    binarization::internal::k3 = atof(options.opt_value("k3").c_str());
+    k3 = atof(options.opt_value("k3").c_str());
   if (options.is_set("k4"))
-    binarization::internal::k4 = atof(options.opt_value("k4").c_str());
+    k4 = atof(options.opt_value("k4").c_str());
 
   scribo::debug::logger() << "Using w_1=" << w_1 << " - s=" << s
-			  << " - k2=" << binarization::internal::k2
-			  << " - k3=" << binarization::internal::k3
-			  << " - k4=" << binarization::internal::k4
+			  << " - k2=" << k2
+			  << " - k3=" << k3
+			  << " - k4=" << k4
 			  << std::endl;
 
   scribo::binarization::internal::scale_image_output = "scale_image.pgm";
@@ -176,7 +182,7 @@ int main(int argc, char *argv[])
 
   // Binarize.
   image2d<bool>
-    output = scribo::binarization::sauvola_ms(input_1_gl, w_1, s);
+    output = scribo::binarization::sauvola_ms(input_1_gl, w_1, s, k2, k3, k4);
 
   scribo::debug::logger().stop_time_logging("Binarized in");
 
