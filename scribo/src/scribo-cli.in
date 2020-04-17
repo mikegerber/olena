@@ -33,9 +33,9 @@ EOF
 usage()
 {
     cat <<EOF
-Usage: $bin [version] [help] COMMAND [ARGS]
+Usage: $bin COMMAND [ARGS]
 
-List of available COMMAND argument:
+List of available COMMAND options:
 
   Full Toolchains
   ---------------
@@ -76,9 +76,17 @@ List of available COMMAND argument:
 
    * Binarization
 
-     sauvola           Sauvola's algorithm.
+     otsu              Otsu's (1979) global thresholding algorithm.
 
-     sauvola-ms        Multi-scale Sauvola's algorithm.
+     niblack           Niblack's (1985) local thresholding algorithm.
+
+     sauvola           Sauvola and Pietikainen's (2000) local/adpative algorithm.
+
+     kim               Kim's (2004) algorithm.
+
+     wolf              Wolf and Jolion's (2004) algorithm.
+
+     sauvola-ms        Lazzara's (2013) multi-scale Sauvola algorithm.
 
      sauvola-ms-fg     Extract foreground objects and run multi-scale
                        Sauvola's algorithm.
@@ -86,8 +94,19 @@ List of available COMMAND argument:
      sauvola-ms-split  Run multi-scale Sauvola's algorithm on each color
                        component and merge results.
 
----------------------------------------------------------------------------
-See '$bin COMMAND --help' for more information on a specific command.
+     singh             Singh's (2014) algorithm.
+
+
+  Other
+  -----
+
+     version           Show version and exit
+
+     help              Show this message and exit
+
+
+For command arguments, see '$bin COMMAND --help' for more information
+on each specific COMMAND.
 EOF
 }
 
@@ -101,55 +120,56 @@ run_cmd()
     fi
     shift;
 
-    case $cmd in
+    case "$cmd" in
 
 	doc-ppc)
-	    $bdir/text_in_doc_preprocess $@
+	    "$bdir/text_in_doc_preprocess" "$@"
 	    ;;
 
 	doc-ocr)
-	    $bdir/pbm_text_in_doc $@
+	    "$bdir/pbm_text_in_doc" "$@"
 	    ;;
 
 	doc-dia)
-	    $bdir/content_in_doc $@
+	    "$bdir/content_in_doc" "$@"
 	    ;;
 
 	pic-loc)
-	    $bdir/text_in_picture $@
+	    "$bdir/text_in_picture" "$@"
 	    ;;
 
 	pic-ocr)
-	    $bdir/text_recognition_in_picture $@
+	    "$bdir/text_recognition_in_picture" "$@"
 	    ;;
 
 	xml2doc)
-	    $bdir/scribo-xml2doc $@
+	    "$bdir/scribo-xml2doc" "$@"
 	    ;;
 
 	sauvola)
-	    $bdir/sauvola $@
+	    "$bdir/sauvola" "$@"
 	    ;;
 
 	sauvola-ms)
-	    $bdir/sauvola_ms $@
+	    "$bdir/sauvola_ms" "$@"
 	    ;;
 
     	sauvola-ms-fg)
-	    $bdir/sauvola_ms_fg $@
+	    "$bdir/sauvola_ms_fg" "$@"
 	    ;;
 
     	sauvola-ms-split)
-	    $bdir/sauvola_ms_split $@
+	    "$bdir/sauvola_ms_split" "$@"
 	    ;;
 
 	*)
-	    cmd_bin=`echo $cmd | sed -e 's/-/_/g'`
-	    if test -f $bdir/$cmd_bin; then
-		$bdir/$cmd_bin $@
+	    cmd_bin=`echo "$cmd" | sed -e 's/-/_/g'`
+	    if test -f "$bdir/$cmd_bin"; then
+		"$bdir/$cmd_bin" "$@"
 	    else
-		echo "Error: Invalid command!"
+		echo "Error: Invalid command '$cmd'" >&2
 		usage
+                exit 1
 	    fi
     esac
 }
@@ -162,17 +182,13 @@ case $1 in
 	;;
 
 
-    help | --help)
+    help | --help | -h)
 
 	usage
 	;;
 
-    help)
-
-	;;
-
     *)
-	run_cmd $@
+	run_cmd "$@"
 	;;
 
 esac
