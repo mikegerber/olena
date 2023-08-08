@@ -5,7 +5,26 @@
 
 override_dh_auto_configure:
 	./bootstrap
-	dh_auto_configure -- --enable-scribo --libexecdir=/usr/lib
+	# Use configure options from ocrd_olena:
+	# --disable-dependency-tracking
+	# --with-tesseract=no
+	# SCRIBO_CXXFLAGS="-DNDEBUG -DSCRIBO_NDEBUG -O2"
+	dh_auto_configure -- \
+		--libexecdir=/usr/lib \
+		--disable-dependency-tracking \
+		--with-tesseract=no \
+		--enable-doc \
+		--enable-scribo SCRIBO_CXXFLAGS="-DNDEBUG -DSCRIBO_NDEBUG -O2"
+
+# FIXME Overrides to support parallel builds
+# * https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=532805)
+# * dpkg-buildpackage -j<n> should set MAKEFLAGS but it doesn't work
+# * So setting -j<n> here
+PARALLEL_MAKE = make -j8
+override_dh_auto_build:
+	$(PARALLEL_MAKE) CXX=g++-7
+override_dh_auto_test:
+	$(PARALLEL_MAKE) check VERBOSE=1 CXX=g++-7
 
 override_dh_auto_install:
 	dh_auto_install

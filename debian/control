@@ -2,7 +2,21 @@ Source: olena
 Section: devel
 Priority: optional
 Maintainer: Olena Team - EPITA Research and Development Laboratory (LRDE) <olena@lrde.epita.fr>
-Build-Depends: debhelper (>= 7.0.50), autotools-dev, dpkg-dev (>= 1.13.19)
+Build-Depends:
+	debhelper (>= 7.0.50),
+	autotools-dev,
+	dpkg-dev (>= 1.13.19),
+	libgraphicsmagick++1-dev,
+	graphicsmagick-libmagick-dev-compat,
+	libqt4-dev,
+	doxygen,
+	hevea,
+	python3-docutils,
+        bibtex2html,
+	texlive-latex-base,
+	latex2html,
+	imagemagick,
+	g++-7
 Standards-Version: 3.9.3
 Vcs-Browser: http://git.lrde.epita.fr/?p=olena.git;a=summary
 Vcs-Git: git://git.lrde.epita.fr/olena
@@ -38,10 +52,6 @@ Architecture: any
 Depends:
 	${shlibs:Depends},
 	${misc:Depends},
-	libtesseract-dev (>= 3.02),
-	libgraphicsmagick++1-dev,
-	graphicsmagick-libmagick-dev-compat,
-	libqt4-dev,
 	xsltproc,
 	fop
 Description: Set of tools based on Olena
@@ -70,7 +80,6 @@ Recommends:
 	graphicsmagick-libmagick-dev-compat,
 Suggests:
 	libqt4-dev,
-	libtesseract-dev (>= 3.02)
 Description: Development files for Olena
  This package includes all the development files needed to use Olena,
  a C++ generic image processing platform.
