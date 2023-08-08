@@ -8,7 +8,6 @@ Build-Depends:
 	dpkg-dev (>= 1.13.19),
 	libgraphicsmagick++1-dev,
 	graphicsmagick-libmagick-dev-compat,
-	libqt4-dev,
 	doxygen,
 	hevea,
 	python3-docutils,
@@ -78,8 +77,6 @@ Depends:
 Recommends:
 	libgraphicsmagick++1-dev,
 	graphicsmagick-libmagick-dev-compat,
-Suggests:
-	libqt4-dev,
 Description: Development files for Olena
  This package includes all the development files needed to use Olena,
  a C++ generic image processing platform.
