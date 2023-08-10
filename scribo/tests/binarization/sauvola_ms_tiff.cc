@@ -45,7 +45,7 @@ int main()
 
   image2d<int_u8> input;
   io::tiff::load(input, SCRIBO_IMG_DIR "/lena.tiff");
-  image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2);
+  image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2, 0.34);
   image2d<bool> ref;
   io::pbm::load(ref, SCRIBO_TESTS_DIR "/binarization/sauvola_ms_tiff.ref.pbm");
   mln_assertion(bin == ref);

@@ -45,7 +45,7 @@ int main()
     image2d<value::int_u8> input;
     io::pgm::load(input, MILENA_IMG_DIR "/lena.pgm");
 
-    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2);
+    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2, 0.34);
 
     image2d<bool> ref;
     io::pbm::load(ref, SCRIBO_TESTS_DIR "/binarization/sauvola_ms.ref.pbm");
@@ -58,7 +58,7 @@ int main()
     image2d<value::int_u8> input;
     io::pgm::load(input, SCRIBO_IMG_DIR "/lena_wodd_heven.pgm");
 
-    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2);
+    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2, 0.34);
 
     image2d<bool> ref;
     io::pbm::load(ref, SCRIBO_TESTS_DIR "binarization/sauvola_ms_wodd_heven.ref.pbm");
@@ -71,7 +71,7 @@ int main()
     image2d<value::int_u8> input;
     io::pgm::load(input, SCRIBO_IMG_DIR "/lena_weven_hodd.pgm");
 
-    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2);
+    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2, 0.34);
 
     image2d<bool> ref;
     io::pbm::load(ref, SCRIBO_TESTS_DIR "binarization/sauvola_ms_weven_hodd.ref.pbm");
@@ -84,7 +84,7 @@ int main()
     image2d<value::int_u8> input;
     io::pgm::load(input, SCRIBO_IMG_DIR "/lena_wodd_hodd.pgm");
 
-    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2);
+    image2d<bool> bin = scribo::binarization::sauvola_ms(input, 21, 2, 0.34);
 
     image2d<bool> ref;
     io::pbm::load(ref, SCRIBO_TESTS_DIR "binarization/sauvola_ms_wodd_hodd.ref.pbm");
