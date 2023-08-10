@@ -11,11 +11,13 @@ Build-Depends:
 	doxygen,
 	hevea,
 	python3-docutils,
-        bibtex2html,
+	bibtex2html,
 	texlive-latex-base,
+	texlive-plain-generic,
 	latex2html,
 	imagemagick,
-	g++-7
+	g++-10,
+	qhelpgenerator-qt5
 Standards-Version: 3.9.3
 Vcs-Browser: http://git.lrde.epita.fr/?p=olena.git;a=summary
 Vcs-Git: git://git.lrde.epita.fr/olena

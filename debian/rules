@@ -22,9 +22,9 @@ override_dh_auto_configure:
 # * So setting -j<n> here
 PARALLEL_MAKE = make -j8
 override_dh_auto_build:
-	$(PARALLEL_MAKE) CXX=g++-7
+	$(PARALLEL_MAKE) CXX=g++-10
 override_dh_auto_test:
-	$(PARALLEL_MAKE) check VERBOSE=1 CXX=g++-7
+	$(PARALLEL_MAKE) check VERBOSE=1 CXX=g++-10
 
 override_dh_auto_install:
 	dh_auto_install

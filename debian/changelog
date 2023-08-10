@@ -2,8 +2,11 @@ olena (2.1.0+ocrd-git+2) UNRELEASED; urgency=medium
 
   * Update to the current OCR-D/olena version
   * Remove Qt dependency
+    * But directly depend on qhelpgenerator-qt5 to fix build
+  * Build using g++-10
+  * Add texlive-plain-generic build-dep
 
- -- Mike Gerber <mike.gerber@sbb.spk-berlin.de>  Tue 08 Aug 2023 18:37:09 +0100
+ -- Mike Gerber <mike.gerber@sbb.spk-berlin.de>  Tue, 08 Aug 2023 18:37:09 +0100
 
 olena (2.1-0+ocrd-git+1) UNRELEASED; urgency=medium
 
