@@ -8,6 +8,7 @@
 *.pyc
 *.qrc.cc
 *.stamp
+*.trs
 *.ui.h
 *~
 .deps
