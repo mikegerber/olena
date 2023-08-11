@@ -2,6 +2,20 @@ on: push
 
 jobs:
   build-debs:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: debian-12
+            docker-image: debian:12-slim
+          - os: ubuntu-22.04
+            docker-image: ubuntu:22.04
+          - os: ubuntu-22.10
+            docker-image: ubuntu:22.10
+          - os: ubuntu-23.04
+            docker-image: ubuntu:23.04
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -9,4 +23,9 @@ jobs:
         env:
           DEB_BUILD_OPTIONS: noautodbgsym
         with:
+          docker-image: ${{ matrix.docker-image }}
           buildpackage-opts: --build=binary --no-sign
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: debian/artifacts/
